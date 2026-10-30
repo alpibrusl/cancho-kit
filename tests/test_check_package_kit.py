@@ -17,6 +17,8 @@ One sentence.
 
 ## A complete program
 
+![what the program draws](docs/figure.svg)
+
 ```
 code
 ```
@@ -37,7 +39,7 @@ Things. [the doc](docs/design.md)
 """
 
 
-def package(readme=TIER2, files=("LICENSE", "NOTICE", "AGENTS.md", "docs/design.md")):
+def package(readme=TIER2, files=("LICENSE", "NOTICE", "AGENTS.md", "docs/design.md", "docs/figure.svg")):
     d = pathlib.Path(tempfile.mkdtemp())
     (d / "README.md").write_text(readme)
     for f in files:
@@ -89,15 +91,30 @@ class Checker(unittest.TestCase):
     def test_the_files_of_the_tier_are_required(self):
         for missing in ("LICENSE", "NOTICE", "AGENTS.md"):
             with self.subTest(missing=missing):
-                files = tuple(f for f in ("LICENSE", "NOTICE", "AGENTS.md", "docs/design.md") if f != missing)
+                files = tuple(f for f in ("LICENSE", "NOTICE", "AGENTS.md", "docs/design.md", "docs/figure.svg") if f != missing)
                 self.assertIn("kit.file-missing", rules(package(files=files)))
 
     def test_docs_agents_satisfies_the_agent_file(self):
-        self.assertEqual(rules(package(files=("LICENSE", "NOTICE", "docs/agents.md", "docs/design.md"))), [])
+        self.assertEqual(rules(package(files=("LICENSE", "NOTICE", "docs/agents.md", "docs/design.md", "docs/figure.svg"))), [])
 
     def test_a_broken_relative_link_is_refused_and_external_links_are_not_followed(self):
         self.assertIn("kit.link-broken", rules(package(TIER2.replace("docs/design.md", "docs/nope.md"))))
-        self.assertEqual(rules(package(TIER2 + "\n[x](https://example.org/a) [y](#here) ![i](nothing.png)\n")), [])
+        self.assertEqual(rules(package(TIER2 + "\n[x](https://example.org/a) [y](#here)\n")), [])
+
+    def test_the_visuals_are_counted_and_checked(self):
+        self.assertIn("kit.visual-missing", rules(package(TIER2.replace("![what the program draws](docs/figure.svg)", ""))))
+        self.assertIn("kit.image-alt-missing", rules(package(TIER2.replace("![what the program draws]", "![]"))))
+        self.assertIn("kit.image-missing", rules(package(TIER2.replace("docs/figure.svg", "docs/none.svg"))))
+        html = TIER2.replace("![what the program draws](docs/figure.svg)", '<img src="docs/figure.svg" alt="a plot">')
+        self.assertEqual(rules(package(html)), [])
+        self.assertEqual(rules(package(TIER2.replace("![what the program draws](docs/figure.svg)", "![a video](https://example.org/v.png)"))), [])
+        self.assertIn("kit.visual-missing", rules(package(), tier=1))   # tier one wants two
+
+    def test_a_long_readme_is_a_warning_not_a_problem(self):
+        d = package(TIER2 + "\nline\n" * 300)
+        kit.check(d)
+        self.assertEqual([w["rule"] for w in kit.check.warnings], ["kit.readme-long"])
+        self.assertEqual(rules(d), [])
 
     def test_tier_one_wants_more_and_tier_three_less(self):
         self.assertIn("kit.section-missing", rules(package(), tier=1))

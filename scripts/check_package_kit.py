@@ -41,6 +41,10 @@ REQUIRED_FILES = {
     3: [("README.md",), ("LICENSE",)],
 }
 KIND_LINE = re.compile(r"\*\*Kind:\*\*\s*([a-z]+)\s*[·|,]\s*\*\*Tier:\*\*\s*([123])(?:\s*[·|,]\s*\*\*Stage:\*\*\s*([a-z]+))?", re.I)
+IMAGE = re.compile(r"!\[([^\]]*)\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)|<img\b[^>]*?src=\"([^\"]+)\"[^>]*>", re.I)
+IMG_ALT = re.compile(r"alt=\"([^\"]+)\"", re.I)
+MIN_VISUALS = {1: 2, 2: 1, 3: 0}
+README_LINES = 220   # advisory: the front door is short, the rest is in docs/
 LINK = re.compile(r"(?<!!)\[[^\]]*\]\(([^)\s#][^)\s]*)(?:\s+\"[^\"]*\")?\)")
 HEADING = re.compile(r"^(#{2,3})\s+(.*?)\s*#*\s*$")
 
@@ -72,6 +76,7 @@ def sections_found(text):
 def check(root, kind=None, tier=None):
     root = pathlib.Path(root)
     problems = []
+    warnings = check.warnings = []
 
     def bad(rule, message):
         problems.append({"rule": rule, "message": message})
@@ -109,11 +114,31 @@ def check(root, kind=None, tier=None):
     for alternatives in REQUIRED_FILES[tier]:
         if not any((root / a).exists() for a in alternatives):
             bad("kit.file-missing", "no %s" % " or ".join(alternatives))
+    visuals = 0
+    for m in IMAGE.finditer(text):
+        alt, target = (m.group(1), m.group(2)) if m.group(2) else (None, m.group(3))
+        if alt is None:
+            a = IMG_ALT.search(m.group(0))
+            alt = a.group(1) if a else ""
+        if re.match(r"[a-z][a-z0-9+.-]*:", target, re.I):
+            visuals += 1
+            continue
+        if not (root / target.split("#")[0]).exists():
+            bad("kit.image-missing", "the image %r names no file" % target)
+            continue
+        visuals += 1
+        if not alt.strip():
+            bad("kit.image-alt-missing", "the image %r has no alt text" % target)
+    if visuals < MIN_VISUALS[tier]:
+        bad("kit.visual-missing", "%d image(s), video poster(s) or figure(s) in the README; tier %d wants at least %d, to show the idea before the words" % (visuals, tier, MIN_VISUALS[tier]))
     for target in LINK.findall(text):
         if re.match(r"[a-z][a-z0-9+.-]*:", target, re.I) or target.startswith("#"):
             continue
         if not (root / target.split("#")[0]).exists():
             bad("kit.link-broken", "the link %r names no file" % target)
+    n = len(text.split("\n"))
+    if n > README_LINES:
+        warnings.append({"rule": "kit.readme-long", "message": "README.md has %d lines (advisory limit %d): the front door is short and the reference lives in docs/" % (n, README_LINES)})
     return problems
 
 
@@ -130,10 +155,12 @@ def main(argv):
         return 2
     problems = check(path[0], opts.get("kind"), int(opts["tier"]) if opts.get("tier") else None)
     if "--json" in argv:
-        print(json.dumps({"ok": not problems, "problems": problems}, indent=1))
+        print(json.dumps({"ok": not problems, "problems": problems, "warnings": check.warnings}, indent=1))
     else:
         for p in problems:
             print("%s: %s: %s" % (path[0], p["rule"], p["message"]))
+        for w in check.warnings:
+            print("%s: warning: %s: %s" % (path[0], w["rule"], w["message"]))
         if not problems:
             print("%s: conforms" % path[0])
     return 1 if problems else 0

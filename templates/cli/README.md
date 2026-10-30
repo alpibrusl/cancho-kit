@@ -14,6 +14,12 @@ One sentence: what it does and for whom. The promise a reader can check.
 $ NAME ...
 ```
 
+<!-- Show the idea before the words: a figure (docs/figures/*.svg, generated from the same runs as the stories), a video poster linking to the recording, or a screenshot. Every image has alt text. Tier 1 wants at least two in the README. -->
+
+![ALT: what the figure shows, in a sentence](docs/figures/FIGURE.svg)
+
+[![ALT: what the recording shows](docs/assets/demo/POSTER.png)](docs/assets/demo/DEMO.mp4)
+
 ## What is special
 
 <!-- Three or four points. Each: the claim, the evidence (a test, a measurement, a committed manifest), and what it does NOT cover. The cancho points belong here:

@@ -10,6 +10,8 @@ One sentence: what it does and for whom.
 
 <!-- Ten lines or fewer, built and run by a check: the code, what it prints, and the compiler's refusal when the authority declaration is removed. -->
 
+![ALT: what the program draws or prints](docs/figures/FIGURE.svg)
+
 ## What is special
 
 <!-- The authority it needs and nothing more; what it refuses; what is exact; what is pinned. Each with its evidence and what it does not cover. -->
