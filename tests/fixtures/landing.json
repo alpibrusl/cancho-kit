@@ -1,0 +1,84 @@
+{
+ "name": "cancho-demo",
+ "tagline": "A demonstration package that shows the layout.",
+ "sub": "One sentence under the title, saying what it does and for whom.",
+ "kind": "library",
+ "tier": 2,
+ "stage": "built",
+ "accent": "#0b7a75",
+ "accent_dark": "#4fd1c5",
+ "repo": "https://github.com/alpibrusl/cancho-demo",
+ "siblings": [
+  [
+   "cancho-table",
+   "https://alpibrusl.github.io/cancho-table/"
+  ]
+ ],
+ "sections": {
+  "why": {
+   "title": "Why it is different",
+   "lead": "Three points, each with its evidence.",
+   "cards": [
+    {
+     "title": "Authority is a fact",
+     "text": "What it can reach is derived by the compiler."
+    },
+    {
+     "title": "Refusals are data",
+     "text": "A rule tag and a repair."
+    }
+   ]
+  },
+  "stories": {
+   "title": "Examples",
+   "lead": "Small programs that run.",
+   "cards": [
+    {
+     "title": "hello.cho",
+     "text": "A complete program.",
+     "href": "examples/hello.cho"
+    }
+   ]
+  },
+  "how": {
+   "title": "How it works",
+   "paragraphs": [
+    "One paragraph."
+   ]
+  },
+  "watch": {
+   "title": "A real run",
+   "run": "$ demo\nhello <world>",
+   "caption": "Printed by the binary."
+  },
+  "status": {
+   "title": "What exists today",
+   "built": "The client.",
+   "not_yet": "The pool."
+  },
+  "results": {
+   "title": "Measured, not promised",
+   "numbers": [
+    {
+     "value": "12 ms",
+     "label": "minimum of 7, one thread, loaded Mac"
+    }
+   ],
+   "fine": "Where it is slower: large payloads."
+  },
+  "try": {
+   "title": "Try it",
+   "code": "cancho install && cancho build --bin demo"
+  },
+  "docs": {
+   "title": "Go deeper",
+   "cards": [
+    {
+     "title": "Design",
+     "text": "The design.",
+     "href": "https://github.com/alpibrusl/cancho-demo/blob/main/docs/design.md"
+    }
+   ]
+  }
+ }
+}

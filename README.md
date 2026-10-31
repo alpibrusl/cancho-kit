@@ -30,12 +30,14 @@ A checker that can fail: each rule has a test that breaks it once, and turning a
 |---|---|
 | `scripts/check_package_kit.py` | the checker: the files of the tier, the README sections of the kit in order, the kind line, the relative links |
 | `tests/` | the proof that each rule can fail |
+| `scripts/render_landing.py`, `landing/landing.css`, [docs/landing.md](docs/landing.md) | the landing page of a package, rendered from its `landing.json` in the layout of the landing pattern |
+| `scripts/check_landing_pattern.py` | checks a home page against the pattern (copied from cancho-www, which is to drop its copy) |
 | `templates/cli/`, `templates/library/` | the README skeleton of those kinds |
 
 
 ## What exists, what cannot yet
 
-Built: the checker and its tests, the `cli` and `library` templates. Not built: templates for `service`, `platform`, `language` and `site`; the generators now copied as `storylib.py` into four repositories; the check of the numbers a README quotes against the recorded benchmark output; the agent-transcript driver.
+Built: the checker and its tests, the `cli` and `library` templates, the landing renderer. Not built: templates for `service`, `platform`, `language` and `site`; the generators now copied as `storylib.py` into four repositories; the check of the numbers a README quotes against the recorded benchmark output; the agent-transcript driver.
 
 The checker tests that the structure is there, not that what is written is true. The measured-claims rule of the standard is enforced by the packages' own gates and by review, not by this script.
 
